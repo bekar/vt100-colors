@@ -26,6 +26,16 @@ def mix(color1, color2=restore): #shifting colors
     style+=color2[1]
     return [color1[2], style, color2[2]]
 
+def modify(color, style=None, bg=None, fg=None):
+    if fg: color[0]=fg
+    if style: color[1]=style
+    if bg: color[2]=style
+    return color
+
+def addstyle(color, style=None):
+    if style: color[1]+=style
+    return color
+
 def paint(c=restore):
     if c=="": return ""
 
