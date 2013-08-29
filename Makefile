@@ -3,10 +3,10 @@
 current: 256colors
 
 256colors:
-	TERM=xterm-256color ./colors.py
+	TERM=xterm-256color ./main.py
 
 8colors:
-	./colors.py
+	./main.py
 
 python2:
-	sed '/print/s/end=""//g' colors.py > color2.py
+	sed '/print/s/end=""//g' main.py > color2.py

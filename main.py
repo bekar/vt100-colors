@@ -1,54 +1,30 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-# SGR - SELECT GRAPHIC RENDITION
-# http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf
-# Section 8.3.117; Pg 61
-
-# program has been written in python3
-# for python2 run sed command as
-# sed '/print/s/, \?end="")/),/g' colors.py > color2.py
-
-
-# from os import environ as env
-# TERM=env["TERM"]
-
-fstyle = [
-    'r', #0 regular
-    'b', #1 bold
-    'f', #2 faint
-    'i', #3 italic
-    'u', #4 underline
-    'w', #5 blink
-    'y', #6 blink2
-    'n', #7 negative
-    's', #8 concealed
-    'x', #9 crossed
+fontstyle = [ #TODO Long names
+    "default", "bold", "faint", "italic", "underline", "blink", "rapid-blink",
+    "negative", "hide", "strike-out"
 ]
 
-pallet = [
-    "black",   # 30
-    "red",     # 31
-    "green",   # 32
-    "yellow",  # 33
-    "blue",    # 34
-    "magenta", # 35
-    "cyan",    # 36
-    "white",   # 37
-    "magic",   # 38 enable 256 color
-    "def",     # 39 default foreground color
+fstyle = [
+    'r', 'b', 'f', 'i', 'u', 'w', 'y', 'n', 's',
+    'x'
+]
+
+pallet8 = [
+    "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white",
+    "magic", "default", # magic: enable 256 color
 ]
 
 restore=["", 'r', ""]
 
-def mix(color1, color2=restore):
+def mix(color1, color2=restore): #shifting colors
     style=""
     for s1 in color1[1]:
         if s1 in color2[1]: continue;
         style+=s1
 
     style+=color2[1]
-
-    return [color1[0], style, color2[0]]
+    return [color1[2], style, color2[2]]
 
 def paint(c=restore):
     if c=="": return ""
@@ -56,11 +32,11 @@ def paint(c=restore):
     def getcode(c, shift):
         if isinstance(c, int): return str("%d;5;%d"%(8+shift, c))
         if c== "" or c=="def": return ""
-        return str(pallet.index(c)+shift)
+        return str(pallet8.index(c)+shift)
 
-    fg=getcode(c[0], 30)
+    fg=getcode(c[2], 30)
     color=fg
-    bg=getcode(c[2], 40)
+    bg=getcode(c[0], 40)
     if color and bg: color+=';'
     color+=bg
 
@@ -71,7 +47,7 @@ def paint(c=restore):
     if color and style: color+=';'
     return '\x1b['+color+style[:-1]+'m'
 
-def pick(bg="def", style="", fg=""):
+def pick(fg="", style="", bg=""):
     # TODO: error handeling
     # try:
     #     pallet[bg]
@@ -83,20 +59,20 @@ def pick(bg="def", style="", fg=""):
 def colortable8():
     for i in range(8):
         for j in range(8):
-            color=pick(pallet[i], "b", pallet[7-j])
-            print("%s%8s"%(paint(color), pallet[i]), end="")
+            color=pick(pallet8[i], "b", pallet8[7-j])
+            print("%s%8s"%(paint(color), pallet8[i]), end="")
         print(paint())
 
 def colortable256():
     count=1
     for i in range(16):
-        color=pick("black", "", i)
+        color=pick(bg=i)
         print("%s%4d"%(paint(color), i), end="")
         if count==8: print(paint()); count=0
         count+=1
 
     for i in range(16,256):
-        color=pick("black", "", i)
+        color=pick(bg=i)
         print("%s%4d"%(paint(color), i), end="")
         if count==6: print(paint()); count=0
         count+=1
@@ -115,9 +91,8 @@ def colortest():
     print(color3, paint(color3), "mixed", paint(), "world")
     color4=mix(pick("cyan", "iub"), pick("red", "iux"))
     print(color4, paint(color4), "mixed", paint(), "world")
-    color5=pick(31)
+    color5=pick(31, "bx")
     print(color5, paint(color5), "mixed", paint(), "world")
-
 
 if __name__=="__main__":
     colortest()
